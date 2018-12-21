@@ -121,6 +121,16 @@ namespace Tema2
 				}
 			}
 		}
+		public static void Crossover(List<BinNum> pop)
+		{
+			for(int i = 0; i < pop.Count(); i++)
+			{
+				if(Globals.rnd.NextDouble() < Globals.MUT_PROB)
+				{
+
+				}
+			}
+		}
 	}
 
 	class Program
