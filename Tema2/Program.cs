@@ -7,15 +7,17 @@ using System.Threading.Tasks;
 namespace Tema2
 {
 
-	static class Constants
+	static class Globals
 	{
 		public const int CHR_LENGTH = 8;
+		public const double MUT_PROB = 0.3;
+		public const double CROSS_PROB = 0.5;
+		public static Random rnd = new Random();
 	}
 
 	class BinNum
 	{
 
-		private Random rnd = new Random();
 		private List<int> num;
 		private int numLength;
 
@@ -39,9 +41,9 @@ namespace Tema2
 		}
 		public void RandomSet()
 		{
-			for (int i = 0; i < Constants.CHR_LENGTH; i++)
+			for (int i = 0; i < Globals.CHR_LENGTH; i++)
 			{
-				if (rnd.NextDouble() < 0.5)
+				if (Globals.rnd.NextDouble() < 0.5)
 				{
 					num.Add(0);
 					numLength++;
@@ -69,7 +71,7 @@ namespace Tema2
 				pow *= 2;
 			}
 
-			return (min + number * (max - min) / (Math.Pow(2, Constants.CHR_LENGTH) - 1));
+			return (min + number * (max - min) / (Math.Pow(2, Globals.CHR_LENGTH) - 1));
 		}
 		public void ShiftBit(int index)
 		{
@@ -93,6 +95,11 @@ namespace Tema2
 
 	static class popOp
 	{
+		public static void Display(List<BinNum> pop)
+		{
+			for (int i = 0; i < pop.Count(); i++)
+				pop[i].Display();
+		}
 		public static void InitPop(int dim, List<BinNum>pop)
 		{
 			BinNum chromozome = new BinNum();
@@ -101,6 +108,17 @@ namespace Tema2
 				chromozome.Reset();
 				chromozome.RandomSet();
 				pop.Add(new BinNum(chromozome));
+			}
+		}
+		public static void Mutation(List<BinNum> pop)
+		{
+			for (int i = 0; i < pop.Count(); i++)
+			{
+				for (int j = 0; j < Globals.CHR_LENGTH; j++)
+				{
+					if (Globals.rnd.NextDouble() < Globals.MUT_PROB)
+						pop[i].ShiftBit(j);
+				}
 			}
 		}
 	}
@@ -115,7 +133,11 @@ namespace Tema2
 
 			//5 dimensiuni
 			popOp.InitPop(5, Population);
-			Console.WriteLine(Functions.Rastrigin(Population).ToString());
+			popOp.Display(Population);
+			Console.Write("\n");
+			popOp.Mutation(Population);
+			popOp.Display(Population);
+			//Console.WriteLine(Functions.Rastrigin(Population).ToString());
 		}
 	}
 }
