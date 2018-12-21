@@ -59,21 +59,49 @@ namespace Tema2
 				Console.Write(num[i].ToString());
 			Console.Write("\n");
 		}
-		public int GetNum()
+		public double GetNum(double min, double max)
 		{
-			int number = 0;
-			int pow = 1;
+			double number = 0;
+			double pow = 1;
 			for (int i = 7; i >= 0; i--)
 			{
 				number += num[i] * pow;
 				pow *= 2;
 			}
 
-			return number;
+			return (min + number * (max - min) / (Math.Pow(2, Constants.CHR_LENGTH) - 1));
 		}
 		public void ShiftBit(int index)
 		{
 			num[index] = (num[index] + 1) % 2;
+		}
+	}
+
+	static class Functions
+	{
+		public static double Rastrigin(List<BinNum> pop)
+		{
+			double sum = 10 * pop.Count();
+			double min = -5.12;
+			double max = 5.12;
+			for (int i = 0; i < pop.Count(); i++)
+				sum += pop[i].GetNum(min, max);
+
+			return sum;
+		}
+	}
+
+	static class popOp
+	{
+		public static void InitPop(int dim, List<BinNum>pop)
+		{
+			BinNum chromozome = new BinNum();
+			for(int i = 0; i < dim; i++)
+			{
+				chromozome.Reset();
+				chromozome.RandomSet();
+				pop.Add(new BinNum(chromozome));
+			}
 		}
 	}
 
@@ -84,15 +112,10 @@ namespace Tema2
 		{
 			BinNum chromozome = new BinNum();
 			List<BinNum> Population = new List<BinNum>();
-			for(int i = 0; i < 8; i++)
-			{
-				chromozome.Reset();
-				chromozome.RandomSet();
-				Population.Add(new BinNum(chromozome));		
-			}
-			for (int i = 0; i < Constants.CHR_LENGTH; i++)
-				Population[i].Display();
 
+			//5 dimensiuni
+			popOp.InitPop(5, Population);
+			Console.WriteLine(Functions.Rastrigin(Population).ToString());
 		}
 	}
 }
