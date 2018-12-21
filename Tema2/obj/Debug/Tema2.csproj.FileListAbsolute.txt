@@ -1,0 +1,7 @@
+D:\Anul 2\Sem I\GA\Tema2\Tema2\bin\Debug\Tema2.exe.config
+D:\Anul 2\Sem I\GA\Tema2\Tema2\bin\Debug\Tema2.exe
+D:\Anul 2\Sem I\GA\Tema2\Tema2\bin\Debug\Tema2.pdb
+D:\Anul 2\Sem I\GA\Tema2\Tema2\obj\Debug\Tema2.csprojAssemblyReference.cache
+D:\Anul 2\Sem I\GA\Tema2\Tema2\obj\Debug\Tema2.csproj.CoreCompileInputs.cache
+D:\Anul 2\Sem I\GA\Tema2\Tema2\obj\Debug\Tema2.exe
+D:\Anul 2\Sem I\GA\Tema2\Tema2\obj\Debug\Tema2.pdb
