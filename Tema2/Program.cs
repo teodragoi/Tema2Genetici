@@ -31,47 +31,61 @@ namespace Tema2
 			num = new List<int>(number.num);
 			numLength = number.numLength;
 		}
+		public void setDim(int dim)
+		{
+			numLength = dim;
+		}
+		public int getDim()
+		{
+			return numLength;
+		}
 		public void Reset()
 		{
 			while(num.Any())
-			{
-				num.RemoveAt(numLength - 1);
-				numLength--;
-			}
+				num.RemoveAt(num.Count() - 1);
 		}
 		public void RandomSet()
 		{
-			for (int i = 0; i < Globals.CHR_LENGTH; i++)
+			for (int i = 0; i < Globals.CHR_LENGTH * numLength; i++)
 			{
 				if (Globals.rnd.NextDouble() < 0.5)
 				{
 					num.Add(0);
-					numLength++;
 				}
 				else
 				{
 					num.Add(1);
-					numLength++;
 				}
 			}
 		}
 		public void Display()
 		{
-			for (int i = 0; i < numLength; i++)
+			for (int i = 0; i < numLength * Globals.CHR_LENGTH; i++)
+			{
 				Console.Write(num[i].ToString());
+				if ((i + 1) % Globals.CHR_LENGTH == 0)
+					Console.Write(" ");
+			}
 			Console.Write("\n");
 		}
-		public double GetNum(double min, double max)
+		public List<double> GetNum(double min, double max)
 		{
-			double number = 0;
-			double pow = 1;
-			for (int i = 7; i >= 0; i--)
+			List<double> Values = new List<double>();
+
+
+			for (int i = numLength * Globals.CHR_LENGTH - 1; i >= 0; i -= Globals.CHR_LENGTH)
 			{
-				number += num[i] * pow;
-				pow *= 2;
+				double number = 0;
+				double pow = 1;
+				for (int j = i; j >= i - Globals.CHR_LENGTH + 1; j--)
+				{
+					number += num[j] * pow;
+					pow *= 2;
+				}
+				Values.Add(min + number * (max - min) / (Math.Pow(2, Globals.CHR_LENGTH) - 1));
 			}
 
-			return (min + number * (max - min) / (Math.Pow(2, Globals.CHR_LENGTH) - 1));
+			return Values;
 		}
 		public void ShiftBit(int index)
 		{
@@ -85,15 +99,26 @@ namespace Tema2
 
 	static class Functions
 	{
-		public static double Rastrigin(List<BinNum> pop)
+		public static List<double> Rastrigin(List<BinNum> pop)
 		{
-			double sum = 10 * pop.Count();
-			double min = -5.12;
-			double max = 5.12;
-			for (int i = 0; i < pop.Count(); i++)
-				sum += pop[i].GetNum(min, max);
+			List<double> Values = new List<double>();
 
-			return sum;
+			for (int i = 0; i < pop.Count(); i++)
+			{
+				double sum = 10 * pop[i].getDim();
+				double min = -5.12;
+				double max = 5.12;
+
+				List<double> tempRes = new List<double>(pop[i].GetNum(min, max));
+
+				for (int j = 0; j < pop[i].getDim(); j++)
+					sum += tempRes[j] * tempRes[j] - 10 * Math.Cos(2 * Math.PI * tempRes[j]);
+
+				//10 * n + sum(x(i) ^ 2 - 10·cos(2·pi·x(i)))
+
+				Values.Add(sum);
+			}
+			return Values;
 		}
 	}
 
@@ -108,7 +133,8 @@ namespace Tema2
 		public static void InitPop(int dim, List<BinNum>pop)
 		{
 			BinNum chromozome = new BinNum();
-			for(int i = 0; i < dim; i++)
+			chromozome.setDim(dim);
+			for(int i = 0; i < 100; i++)
 			{
 				chromozome.Reset();
 				chromozome.RandomSet();
@@ -120,7 +146,7 @@ namespace Tema2
 		{
 			for (int i = 0; i < pop.Count(); i++)
 			{
-				for (int j = 0; j < Globals.CHR_LENGTH; j++)
+				for (int j = 0; j < Globals.CHR_LENGTH * pop[i].getDim(); j++)
 				{
 					if (Globals.rnd.NextDouble() < Globals.MUT_PROB)
 						pop[i].ShiftBit(j);
@@ -134,43 +160,43 @@ namespace Tema2
 
 			for(int i = 1; i < pop.Count(); i += 2)
 			{
-				if(Globals.rnd.NextDouble() < Globals.CROSS_PROB)
-				{
-					cut = Globals.rnd.Next(0, Globals.CHR_LENGTH);
-					for(int j = cut; j < Globals.CHR_LENGTH; j++)
+				for(int k = 0; k < pop[i].getDim(); k++)
+					if(Globals.rnd.NextDouble() < Globals.CROSS_PROB)
 					{
-						if( pop[i].GetBit(j)  != pop[i - 1].GetBit(j) )
+						cut = Globals.rnd.Next(k, Globals.CHR_LENGTH * (k + 1) - 1);
+						for(int j = cut; j < Globals.CHR_LENGTH * k; j++)
 						{
-							pop[i].ShiftBit(j);
-							pop[i - 1].ShiftBit(j);
+							if( pop[i].GetBit(j)  != pop[i - 1].GetBit(j) )
+							{
+								pop[i].ShiftBit(j);
+								pop[i - 1].ShiftBit(j);
+							}
 						}
 					}
-				}
 			}
 		}
 
-		public static List<double> Evaluate(List<BinNum> pop, ,double Min, double Max)
+		public static List<double> Evaluate(List<BinNum> pop, List<double> funcVal ,double Min, double Max)
 		{
-			List<double> Fitness = new List<double>();
-
 			double max = Double.MinValue;
-			double min = Double.MinValue;
-
+			double min = Double.MaxValue;
 			double suma = 0;
 
+			List<double> Fitness = new List<double>();
+
 			for(int i = 0; i < pop.Count(); i++)
 			{
-				if (pop[i].GetNum(Min, Max) < min)
-					min = pop[i].GetNum(Min, Max);
-				if (pop[i].GetNum(Min, Max) > max)
-					max = pop[i].GetNum(Min, Max);
-			}
-			for(int i = 0; i < pop.Count(); i++)
-			{
-				suma += max + 2 - pop[i].GetNum(Min, Max);
-				Fitness.Add(max + 2 - pop[i].GetNum(Min, Max));
+				if (funcVal[i] > max)
+					max = funcVal[i];
+				if (funcVal[i] < min)
+					min = funcVal[i];
 			}
 
+			for (int i = 0; i < pop.Count; i++)
+			{
+				suma += max + 2 - funcVal[i];
+				Fitness.Add(max + 2 - funcVal[i]);
+			}
 
 			Fitness.Add(suma);
 			Fitness.Add(min);
@@ -181,9 +207,41 @@ namespace Tema2
 		public static List<BinNum> Selection(List<BinNum> pop, List<double> Fitness)
 		{
 			List<BinNum> newPop = new List<BinNum>();
+			List<double> prob = new List<double>();
+
+			double max = Fitness[Fitness.Count() - 2];
+			double candidate = 0;
+
+			int j = 0;
+
+			prob.Add(Fitness[0] / max);
+
+			for (int i = 1; i < Fitness.Count() - 3; i++)
+				prob.Add(prob[i - 1] + Fitness[i] / max);
+
+			prob.Add(1);
+
+			for(int i = 0; i < pop.Count(); i++)
+			{
+				j = 0;
+				candidate = Globals.rnd.NextDouble();
+
+				while(prob[j] < candidate)
+				{
+					j++;
+				}
+
+				newPop.Add(pop[j]);
+			}
 
 			return newPop;
 		}
+
+		//public static List<double> genAlg(List<BinNum> pop, List<double> funcVal, double min, double max)
+		//{
+		//	List<BinNum> newPop = new List<BinNum>();
+		//	List<double> fit = new List<double>();
+		//}
 	}
 
 	class Program
@@ -196,9 +254,9 @@ namespace Tema2
 
 			//5 dimensiuni
 			popOp.InitPop(5, Population);
-			popOp.Display(Population);
+			//popOp.Display(Population);
+			
 			Console.Write("\n");
-			popOp.Crossover(Population);
 			//Console.WriteLine(Functions.Rastrigin(Population).ToString());
 		}
 	}
