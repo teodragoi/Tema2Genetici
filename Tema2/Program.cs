@@ -104,6 +104,7 @@ namespace Tema2
 			for (int i = 0; i < pop.Count(); i++)
 				pop[i].Display();
 		}
+
 		public static void InitPop(int dim, List<BinNum>pop)
 		{
 			BinNum chromozome = new BinNum();
@@ -114,6 +115,7 @@ namespace Tema2
 				pop.Add(new BinNum(chromozome));
 			}
 		}
+
 		public static void Mutation(List<BinNum> pop)
 		{
 			for (int i = 0; i < pop.Count(); i++)
@@ -125,6 +127,7 @@ namespace Tema2
 				}
 			}
 		}
+
 		public static void Crossover(List<BinNum> pop)
 		{
 			int cut = 0;
@@ -144,6 +147,42 @@ namespace Tema2
 					}
 				}
 			}
+		}
+
+		public static List<double> Evaluate(List<BinNum> pop, ,double Min, double Max)
+		{
+			List<double> Fitness = new List<double>();
+
+			double max = Double.MinValue;
+			double min = Double.MinValue;
+
+			double suma = 0;
+
+			for(int i = 0; i < pop.Count(); i++)
+			{
+				if (pop[i].GetNum(Min, Max) < min)
+					min = pop[i].GetNum(Min, Max);
+				if (pop[i].GetNum(Min, Max) > max)
+					max = pop[i].GetNum(Min, Max);
+			}
+			for(int i = 0; i < pop.Count(); i++)
+			{
+				suma += max + 2 - pop[i].GetNum(Min, Max);
+				Fitness.Add(max + 2 - pop[i].GetNum(Min, Max));
+			}
+
+
+			Fitness.Add(suma);
+			Fitness.Add(min);
+
+			return Fitness;
+		}
+
+		public static List<BinNum> Selection(List<BinNum> pop, List<double> Fitness)
+		{
+			List<BinNum> newPop = new List<BinNum>();
+
+			return newPop;
 		}
 	}
 
