@@ -77,6 +77,10 @@ namespace Tema2
 		{
 			num[index] = (num[index] + 1) % 2;
 		}
+		public int GetBit(int index)
+		{
+			return num[index];
+		}
 	}
 
 	static class Functions
@@ -123,11 +127,21 @@ namespace Tema2
 		}
 		public static void Crossover(List<BinNum> pop)
 		{
-			for(int i = 0; i < pop.Count(); i++)
-			{
-				if(Globals.rnd.NextDouble() < Globals.MUT_PROB)
-				{
+			int cut = 0;
 
+			for(int i = 1; i < pop.Count(); i += 2)
+			{
+				if(Globals.rnd.NextDouble() < Globals.CROSS_PROB)
+				{
+					cut = Globals.rnd.Next(0, Globals.CHR_LENGTH);
+					for(int j = cut; j < Globals.CHR_LENGTH; j++)
+					{
+						if( pop[i].GetBit(j)  != pop[i - 1].GetBit(j) )
+						{
+							pop[i].ShiftBit(j);
+							pop[i - 1].ShiftBit(j);
+						}
+					}
 				}
 			}
 		}
@@ -145,8 +159,7 @@ namespace Tema2
 			popOp.InitPop(5, Population);
 			popOp.Display(Population);
 			Console.Write("\n");
-			popOp.Mutation(Population);
-			popOp.Display(Population);
+			popOp.Crossover(Population);
 			//Console.WriteLine(Functions.Rastrigin(Population).ToString());
 		}
 	}
