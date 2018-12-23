@@ -237,11 +237,41 @@ namespace Tema2
 			return newPop;
 		}
 
-		//public static List<double> genAlg(List<BinNum> pop, List<double> funcVal, double min, double max)
-		//{
-		//	List<BinNum> newPop = new List<BinNum>();
-		//	List<double> fit = new List<double>();
-		//}
+		public static List<double> genAlg(string function, double min, double max, int dim)
+		{
+			List<BinNum> newPop = new List<BinNum>();
+			List<BinNum> pop = new List<BinNum>();
+			InitPop(dim, pop);
+
+			List<double> fit = new List<double>();
+
+			double avg = 0;
+			double Min = Double.MaxValue;
+			double Max = Double.MinValue;
+
+			for(int t = 0; t < 1000; t++)
+			{
+				Mutation(pop);
+				Crossover(pop);
+				fit = Evaluate(pop, Functions.Rastrigin(pop), min, max);
+				newPop = Selection(pop, fit);
+				pop = newPop;
+				if (Min > fit[fit.Count() - 1])
+					Min = fit[fit.Count() - 1];
+				if (Max < fit[fit.Count() - 1])
+					Max = fit[fit.Count() - 1];
+				avg += fit[fit.Count() - 1];
+			}
+
+			List<double> res = new List<double>();
+
+			res.Add(Min);
+			res.Add(Max);
+			res.Add(avg / 1000);
+
+			return res;
+
+		}
 	}
 
 	class Program
@@ -253,9 +283,22 @@ namespace Tema2
 			List<BinNum> Population = new List<BinNum>();
 
 			//5 dimensiuni
-			popOp.InitPop(5, Population);
 			//popOp.Display(Population);
-			
+			List<double> tempRes;
+			double min = Double.MaxValue, max = Double.MinValue, avg = 0;
+			for (int i = 0; i < 30; i++)
+			{
+				tempRes = new List<double>(popOp.genAlg("Rastrigin", -5.12, 5.12, 5));
+				if (tempRes[0] < min)
+					min = tempRes[0];
+				if (tempRes[1] > max)
+					max = tempRes[1];
+				avg += tempRes[2];
+			}
+			Console.WriteLine(min.ToString());
+			Console.WriteLine(max.ToString());
+			Console.WriteLine((avg / 30).ToString());
+
 			Console.Write("\n");
 			//Console.WriteLine(Functions.Rastrigin(Population).ToString());
 		}
