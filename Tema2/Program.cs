@@ -120,6 +120,30 @@ namespace Tema2
 			}
 			return Values;
 		}
+
+		public static List<double> Griewangk(List<BinNum> pop)
+		{
+			List<double> Values = new List<double>();
+
+			for(int i = 0; i < pop.Count(); i++)
+			{
+				double sum = 0, prod = 1, res = 0;
+				double min = -600;
+				double max = 600;
+
+				List<double> tempRes = new List<double>(pop[i].GetNum(min, max));
+
+				for(int j = 0; j < pop[i].getDim(); j++)
+				{
+					sum += tempRes[j] * tempRes[j] / 4000;
+					prod *= Math.Cos(tempRes[j] / Math.Sqrt(j));
+				}
+				res = sum - prod + 1;
+				Values.Add(res);
+			}
+			return Values;
+		}
+		
 	}
 
 	static class popOp
@@ -253,7 +277,10 @@ namespace Tema2
 			{
 				Mutation(pop);
 				Crossover(pop);
-				fit = Evaluate(pop, Functions.Rastrigin(pop), min, max);
+				if(function == "Rastrigin")
+					fit = Evaluate(pop, Functions.Rastrigin(pop), min, max);
+				else if (function == "Griewangk")
+					fit = Evaluate(pop, Functions.Griewangk(pop), min, max);
 				newPop = Selection(pop, fit);
 				pop = newPop;
 				if (Min > fit[fit.Count() - 1])
@@ -288,7 +315,7 @@ namespace Tema2
 			double min = Double.MaxValue, max = Double.MinValue, avg = 0;
 			for (int i = 0; i < 30; i++)
 			{
-				tempRes = new List<double>(popOp.genAlg("Rastrigin", -5.12, 5.12, 5));
+				tempRes = new List<double>(popOp.genAlg("Griewangk", -5.12, 5.12, 5));
 				if (tempRes[0] < min)
 					min = tempRes[0];
 				if (tempRes[1] > max)
