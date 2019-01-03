@@ -143,6 +143,29 @@ namespace Tema2
 			}
 			return Values;
 		}
+
+		public static List<double> Rosenbrock(List<BinNum> pop)
+		{
+			List<double> Values = new List<double>();
+
+			for(int i = 0; i < pop.Count(); i++)
+			{
+				double sum = 0;
+				double min = -2.048;
+				double max = 2.048;
+
+				List<double> tempRes = new List<double>(pop[i].GetNum(min, max));
+
+				for(int j = 0; j < pop[i].getDim() - 1; j++)
+				{
+					sum += 100 * Math.Pow((tempRes[j + 1] - tempRes[j] * tempRes[j]), 2) + Math.Pow((1 - tempRes[j]), 2);
+				}
+
+				Values.Add(sum);
+			}
+
+			return Values;
+		}
 		
 	}
 
@@ -277,10 +300,12 @@ namespace Tema2
 			{
 				Mutation(pop);
 				Crossover(pop);
-				if(function == "Rastrigin")
+				if (function == "Rastrigin")
 					fit = Evaluate(pop, Functions.Rastrigin(pop), min, max);
 				else if (function == "Griewangk")
 					fit = Evaluate(pop, Functions.Griewangk(pop), min, max);
+				else if (function == "Rosenbrock")
+					fit = Evaluate(pop, Functions.Rosenbrock(pop), min, max);
 				newPop = Selection(pop, fit);
 				pop = newPop;
 				if (Min > fit[fit.Count() - 1])
@@ -315,7 +340,7 @@ namespace Tema2
 			double min = Double.MaxValue, max = Double.MinValue, avg = 0;
 			for (int i = 0; i < 30; i++)
 			{
-				tempRes = new List<double>(popOp.genAlg("Griewangk", -5.12, 5.12, 5));
+				tempRes = new List<double>(popOp.genAlg("Rosenbrock", -2.048, 2.048, 5));
 				if (tempRes[0] < min)
 					min = tempRes[0];
 				if (tempRes[1] > max)
